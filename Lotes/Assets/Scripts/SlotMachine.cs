@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class SlotMachine : MonoBehaviour {
@@ -15,36 +12,23 @@ public class SlotMachine : MonoBehaviour {
     private int maxSpinTime = 4000;
     // The short delay between one reel and the next start and stop spinning.
     private float delayBetweenReels = 0.2f;
+
+    // Reel spinning controls.
     private float nextSpinFinish = 0f;
     private bool spinning = false;
-    // Game reels.
-    //private List<Reel> reels = new List<Reel>();
-
-    // Order in layer for the figures so they are above the background but below the foreground.
-    private int figureSortingOrder = 5;
-    // Number of reels in play.
-    private int reelAmount = 5;
-
-    private Vector2 slotRectSize;
-
-    private Dictionary<Figure, Sprite> figureToSprite;
-
-    private GameObject lastSlotReel1Ref;
-
-    private List<List<GameObject>> reelsGameObject = new List<List<GameObject>>();
-
-    private List<List<Figure>> reelsList = new List<List<Figure>>();
-
-    private float maxMoveSpeed;
-
+    private float spinSpeed;
     // The speed at which the reel rotates. The higher the number the slower the speed.
     private float reelSpeedDivisor = 10f;
-
-    private float pixelsPerUnit = 100f;
-
-    private float reelUnitsMoved = 0f;
-
     private float spinDuration = 2f;
+    private List<GameObject> reelControls = new List<GameObject>();
+
+    // Sprite and graphical control.
+    private float pixelsPerUnit = 100f;
+    private Dictionary<Figure, Sprite> figureToSprite;
+    // Order in layer for the figures so they are above the background but below the foreground.
+    private int figureSortingOrder = 5;
+    private Vector2 slotRectSize;
+    private float initialMidPosition;
 
     private void Awake() {
         // Load sprites to prepare the figures in the reel.
@@ -56,6 +40,7 @@ public class SlotMachine : MonoBehaviour {
         var lemon = Resources.Load<Sprite>("Figures/6");
         var cherry = Resources.Load<Sprite>("Figures/7");
 
+        // Get what sprite needs each figure, so after loading reel configuration we can assign sprites.
         figureToSprite = new Dictionary<Figure, Sprite>() {
             { Figure.BELL, bell },
             { Figure.WATERMELON, watermelon },
@@ -66,128 +51,52 @@ public class SlotMachine : MonoBehaviour {
             { Figure.CHERRY, cherry }
         };
 
-        reelsGameObject = new List<List<GameObject>>();
-
         // Size of the figure in the reel for reference.
         var spriteRenderer = reel1Slot1Reference.GetComponent<SpriteRenderer>();
         slotRectSize = spriteRenderer.sprite.rect.size;
         pixelsPerUnit = spriteRenderer.sprite.pixelsPerUnit;
-        maxMoveSpeed = -(slotRectSize.y / (reelSpeedDivisor * pixelsPerUnit));
-
-        // Assign the figure order for each reel as configured.
-        reelsList = new List<List<Figure>>() {
-            new List<Figure>() {
-                Figure.ORANGE,
-                Figure.BELL,
-                Figure.WATERMELON,
-                Figure.CHERRY,
-                Figure.PLUM,
-                Figure.LEMON,
-                Figure.GRAPES,
-                Figure.PLUM,
-                Figure.BELL,
-                Figure.BELL,
-                Figure.ORANGE,
-                Figure.GRAPES
-            },
-            new List<Figure>() {
-                Figure.WATERMELON,
-                Figure.CHERRY,
-                Figure.BELL,
-                Figure.PLUM,
-                Figure.CHERRY,
-                Figure.GRAPES,
-                Figure.ORANGE,
-                Figure.LEMON,
-                Figure.LEMON,
-                Figure.LEMON,
-                Figure.CHERRY,
-                Figure.LEMON,
-                Figure.PLUM,
-                Figure.LEMON,
-                Figure.CHERRY
-            },
-            new List<Figure>() {
-                Figure.GRAPES,
-                Figure.WATERMELON,
-                Figure.PLUM,
-                Figure.GRAPES,
-                Figure.BELL,
-                Figure.LEMON,
-                Figure.CHERRY,
-                Figure.BELL,
-                Figure.BELL,
-                Figure.BELL,
-                Figure.ORANGE,
-                Figure.ORANGE,
-                Figure.GRAPES
-            },
-            new List<Figure>() {
-                Figure.LEMON,
-                Figure.PLUM,
-                Figure.PLUM,
-                Figure.LEMON,
-                Figure.GRAPES,
-                Figure.ORANGE,
-                Figure.WATERMELON,
-                Figure.WATERMELON,
-                Figure.BELL,
-                Figure.CHERRY,
-                Figure.CHERRY,
-                Figure.LEMON,
-                Figure.ORANGE,
-                Figure.PLUM,
-                Figure.LEMON
-            },
-            new List<Figure>() {
-                Figure.GRAPES,
-                Figure.CHERRY,
-                Figure.BELL,
-                Figure.WATERMELON,
-                Figure.ORANGE,
-                Figure.ORANGE,
-                Figure.PLUM,
-                Figure.PLUM,
-                Figure.ORANGE,
-                Figure.ORANGE,
-                Figure.GRAPES,
-                Figure.BELL,
-                Figure.WATERMELON,
-                Figure.CHERRY
-            }
-        };
+        spinSpeed = -(slotRectSize.y / (reelSpeedDivisor * pixelsPerUnit));
+        initialMidPosition = reel1Slot1Reference.transform.position.y - slotRectSize.y / pixelsPerUnit;
     }
 
-    void Start() {
+    private void Start() {
         // The first is prepared for reference in the canvas.
         var slotIndex = 0;
         var reelIndex = 0;
-        //reel1Slot.GetComponent<SpriteRenderer>().sprite = asdf[reel1[0]];
-        var previousPos = reel1Slot1Reference.transform.position.y;
-
         var xIncrement = slotRectSize.x / pixelsPerUnit;
         var yIcnrement = slotRectSize.y / pixelsPerUnit;
-
-        GameObject go;
+        GameObject reelParent;
+        GameObject figure;
         SpriteRenderer figureSpriteRenderer;
         float xPosition;
         float yPosition;
 
-        foreach (var reel in reelsList) {
-            reelsGameObject.Add(new List<GameObject>());
-            foreach (var figure in reel) {
-                go = new GameObject("reel" + (reelIndex + 1) + "slot" + (slotIndex + 1));
-                figureSpriteRenderer = go.AddComponent<SpriteRenderer>();
-                go.transform.parent = reel1Slot1Reference.transform.parent;
-                go.GetComponent<SpriteRenderer>().sprite = figureToSprite[figure];
+        foreach (var reelConfiguration in ReelConfiguration.reelList) {
+            var figures = new List<GameObject>();
+            // Cada gameobject con figure debería ir en una tupla con su figure
+            reelParent = new GameObject("reel" + (reelIndex + 1));
+            reelParent.transform.position = reel1Slot1Reference.transform.position;
+            reelParent.AddComponent<ReelControl>();
+            reelControls.Add(reelParent);
+
+            foreach (var figureType in reelConfiguration) {
+                // Create the Game Object that holds the figure sprite.
+                figure = new GameObject("reel" + (reelIndex + 1) + "slot" + (slotIndex + 1));
+                figureSpriteRenderer = figure.AddComponent<SpriteRenderer>();
+                figure.transform.parent = reelParent.transform;
+                figure.GetComponent<SpriteRenderer>().sprite = figureToSprite[figureType];
+                // Position the figures with the initial reference.
                 xPosition = reel1Slot1Reference.transform.position.x + xIncrement * reelIndex + (xIncrement / 14f) * reelIndex;
                 yPosition = reel1Slot1Reference.transform.position.y - yIcnrement * slotIndex;
-                go.transform.position = new Vector2(xPosition, yPosition);
+                figure.transform.position = new Vector2(xPosition, yPosition);
                 figureSpriteRenderer.sortingOrder = figureSortingOrder;
-                reelsGameObject[reelIndex].Add(go.gameObject);
+                // Finally add the figure Game Object to the Reel which gets added to the Reel List.
+                figures.Add(figure.gameObject);
                 slotIndex++;
             }
-            MoveLastFigureToFirst(reelsGameObject[reelIndex]);
+            reelParent.GetComponent<ReelControl>().SetReelConfiguration(figures, initialMidPosition, slotRectSize.y / pixelsPerUnit);
+            // Before the game can start, the last figure needs to be above the first for the upcoming transition.
+            reelParent.GetComponent<ReelControl>().MoveLastFigureToFirst();
             slotIndex = 0;
             reelIndex++;
         }
@@ -198,47 +107,28 @@ public class SlotMachine : MonoBehaviour {
             return;
         }
 
+        // Get a random spin duration.
         var rand = new System.Random();
         spinDuration = rand.Next(minSpinTime, maxSpinTime) / 1000f;
-        nextSpinFinish = Time.time + spinDuration;
 
+        // Set spin duration for each reel slightly apart.
+        var start = Time.time;
+        var spinFinish = start + spinDuration;
+        foreach (var reelParent in reelControls) {
+            reelParent.GetComponent<ReelControl>().Spin(start, spinFinish, spinSpeed);
+            start += delayBetweenReels;
+            spinFinish += delayBetweenReels;
+        }
 
-        // asdf
-        var spinStartTieme = nextSpinFinish;
-        spinning = true;
-
-        /*foreach (Reel reel in reels) {
-            spinStartTieme += delayBetweenReels;
-        }*/
+        // Here we know when all reels have stopped spinning.
+        nextSpinFinish = spinFinish;
     }
 
     void FixedUpdate() {
-        if (spinning) {
-            if (Time.time >= nextSpinFinish) {
-                // Calcular el offset que llevas de movimiento del último y seguir moviendo hasta que el offset sea igual a rectsize.y
-                spinning = false;
-            } else {
-                foreach (var reel in reelsGameObject) {
-                    foreach (var figure in reel) {
-                        figure.transform.Translate(new Vector2(0f, maxMoveSpeed));
-                    }
-                }
-                reelUnitsMoved += Math.Abs(maxMoveSpeed);
-                if (reelUnitsMoved > slotRectSize.y / pixelsPerUnit) {
-                    reelUnitsMoved -= slotRectSize.y / pixelsPerUnit;
-                    foreach (var reel in reelsGameObject) {
-                        MoveLastFigureToFirst(reel);
-                    }
-                }
-            }
+        if (spinning && Time.time >= nextSpinFinish) {
+            spinning = false;
         }
-    }
 
-    private void MoveLastFigureToFirst(List<GameObject> reel) {
-        var first = reel.First();
-        var last = reel.Last();
-        last.transform.position = new Vector2(first.transform.position.x, first.transform.position.y + slotRectSize.y / pixelsPerUnit);
-        reel.Remove(last);
-        reel.Insert(0, last);
+        // En el stop spinning, por cada reelcontrol un GetCenterFigure que se puede pasarle la Figure.
     }
 }

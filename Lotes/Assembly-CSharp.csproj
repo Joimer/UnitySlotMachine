@@ -64,6 +64,8 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Figure.cs" />
     <Compile Include="Assets\Scripts\Reel.cs" />
+    <Compile Include="Assets\Scripts\ReelConfiguration.cs" />
+    <Compile Include="Assets\Scripts\ReelControl.cs" />
     <Compile Include="Assets\Scripts\SlotMachine.cs" />
     <Compile Include="Assets\Scripts\SpinButton.cs" />
     <Reference Include="Unity.Timeline.Editor">
