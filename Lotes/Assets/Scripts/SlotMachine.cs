@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SlotMachine : MonoBehaviour {
@@ -29,6 +30,9 @@ public class SlotMachine : MonoBehaviour {
     private int figureSortingOrder = 5;
     private Vector2 slotRectSize;
     private float initialMidPosition;
+
+    // Winning credits.
+    private WinChecker winChecker = new WinChecker();
 
     private void Awake() {
         // Load sprites to prepare the figures in the reel.
@@ -72,7 +76,7 @@ public class SlotMachine : MonoBehaviour {
         float yPosition;
 
         foreach (var reelConfiguration in ReelConfiguration.reelList) {
-            var figures = new List<GameObject>();
+            var figures = new List<Tuple<Figure, GameObject>>();
             // Cada gameobject con figure debería ir en una tupla con su figure
             reelParent = new GameObject("reel" + (reelIndex + 1));
             reelParent.transform.position = reel1Slot1Reference.transform.position;
@@ -91,7 +95,7 @@ public class SlotMachine : MonoBehaviour {
                 figure.transform.position = new Vector2(xPosition, yPosition);
                 figureSpriteRenderer.sortingOrder = figureSortingOrder;
                 // Finally add the figure Game Object to the Reel which gets added to the Reel List.
-                figures.Add(figure.gameObject);
+                figures.Add(Tuple.Create(figureType, figure.gameObject));
                 slotIndex++;
             }
             reelParent.GetComponent<ReelControl>().SetReelConfiguration(figures, initialMidPosition, slotRectSize.y / pixelsPerUnit);
@@ -100,6 +104,15 @@ public class SlotMachine : MonoBehaviour {
             slotIndex = 0;
             reelIndex++;
         }
+
+        /*
+        List<PatternMatch> prizes;
+        prizes = winChecker.MatchPrize(new List<Figure>() { Figure.LEMON, Figure.LEMON, Figure.PLUM, Figure.PLUM, Figure.PLUM });
+        Debug.Log(prizes.Count);
+        prizes = winChecker.MatchPrize(new List<Figure>() { Figure.LEMON, Figure.LEMON, Figure.LEMON, Figure.LEMON, Figure.PLUM });
+        Debug.Log(prizes.Count);
+        prizes = winChecker.MatchPrize(new List<Figure>() { Figure.PLUM, Figure.LEMON, Figure.LEMON, Figure.LEMON, Figure.LEMON });
+        Debug.Log(prizes.Count);*/
     }
 
     public void Spin() {
@@ -107,6 +120,7 @@ public class SlotMachine : MonoBehaviour {
             return;
         }
 
+        spinning = true;
         // Get a random spin duration.
         var rand = new System.Random();
         spinDuration = rand.Next(minSpinTime, maxSpinTime) / 1000f;
@@ -124,11 +138,16 @@ public class SlotMachine : MonoBehaviour {
         nextSpinFinish = spinFinish;
     }
 
-    void FixedUpdate() {
+    private void FixedUpdate() {
         if (spinning && Time.time >= nextSpinFinish) {
             spinning = false;
-        }
 
-        // En el stop spinning, por cada reelcontrol un GetCenterFigure que se puede pasarle la Figure.
+            // Get current combination to check prizes with.
+            var combination = new List<Figure>();
+            foreach (var reelParent in reelControls) {
+                combination.Add(reelParent.GetComponent<ReelControl>().GetCentralFigure());
+            }
+            winChecker.MatchPrize(combination);
+        }
     }
 }

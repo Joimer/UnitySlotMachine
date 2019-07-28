@@ -63,11 +63,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Figure.cs" />
+    <Compile Include="Assets\Scripts\PatternMatch.cs" />
     <Compile Include="Assets\Scripts\Reel.cs" />
     <Compile Include="Assets\Scripts\ReelConfiguration.cs" />
     <Compile Include="Assets\Scripts\ReelControl.cs" />
     <Compile Include="Assets\Scripts\SlotMachine.cs" />
     <Compile Include="Assets\Scripts\SpinButton.cs" />
+    <Compile Include="Assets\Scripts\WinChecker.cs" />
+    <Compile Include="Assets\Scripts\WinCombination.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/Proyectos/Lotes/Lotes/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
