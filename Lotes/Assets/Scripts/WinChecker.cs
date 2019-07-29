@@ -28,6 +28,7 @@ public class WinChecker {
         winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.LEMON, Figure.LEMON, Figure.LEMON, Figure.LEMON }, 20));
         winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.LEMON, Figure.LEMON, Figure.LEMON }, 10));
         winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.LEMON, Figure.LEMON }, 5));
+        
 
         // After all the winning patterns have been added, we are gonna order it by number of figures.
         // This forces the matcher to find from the most to the least figures without having to keep track of matched patterns and comparing their length / credits.
@@ -37,19 +38,21 @@ public class WinChecker {
     public List<PatternMatch> MatchPrize(List<Figure> pattern) {
         var found = new List<PatternMatch>();
         foreach (var winCombo in winningPatterns) {
-            // Pattern always should be bigger than the win combination.
-            int matches = 0;
+            // Pattern always should be bigger or equal in length than the win combination.
             int winComboIndex = 0;
+            int matched = 0;
             for (var i = 0; i < winCombo.figureCount || i < pattern.Count; i++) {
-                if (winCombo.figures[winComboIndex].Equals(pattern[i])) {
-                    matches++;
-                } else {
-                    matches = 0;
-                    winComboIndex = 0;
+                // We look for patterns from left to right.
+                // At the first instance of a figure not forming a winning pattern, we can check the next.
+                if (!winCombo.figures[winComboIndex].Equals(pattern[i])) {
+                    break;
                 }
-                if (matches == winCombo.figureCount) {
-                    found.Add(new PatternMatch(i, winCombo.figureCount, winCombo.credits));
-                }
+                matched++;
+            }
+            if (matched == winCombo.figureCount) {
+                found.Add(new PatternMatch(pattern, 0, winCombo.figureCount, winCombo.credits));
+                // Right now looking for one pattern per line only.
+                break;
             }
         }
 

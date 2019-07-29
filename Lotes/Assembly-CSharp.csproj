@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\ReelControl.cs" />
     <Compile Include="Assets\Scripts\SlotMachine.cs" />
     <Compile Include="Assets\Scripts\SpinButton.cs" />
+    <Compile Include="Assets\Scripts\WinBoxControl.cs" />
     <Compile Include="Assets\Scripts\WinChecker.cs" />
     <Compile Include="Assets\Scripts\WinCombination.cs" />
     <Reference Include="Unity.Timeline.Editor">

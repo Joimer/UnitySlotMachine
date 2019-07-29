@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SlotMachine : MonoBehaviour {
 
@@ -33,6 +34,14 @@ public class SlotMachine : MonoBehaviour {
 
     // Winning credits.
     private WinChecker winChecker = new WinChecker();
+
+    // Boxes to show wins.
+    public GameObject line1Boxes;
+    public GameObject line2Boxes;
+    public GameObject line3Boxes;
+
+    // Winning text.
+    public Text winningText;
 
     private void Awake() {
         // Load sprites to prepare the figures in the reel.
@@ -104,15 +113,6 @@ public class SlotMachine : MonoBehaviour {
             slotIndex = 0;
             reelIndex++;
         }
-
-        /*
-        List<PatternMatch> prizes;
-        prizes = winChecker.MatchPrize(new List<Figure>() { Figure.LEMON, Figure.LEMON, Figure.PLUM, Figure.PLUM, Figure.PLUM });
-        Debug.Log(prizes.Count);
-        prizes = winChecker.MatchPrize(new List<Figure>() { Figure.LEMON, Figure.LEMON, Figure.LEMON, Figure.LEMON, Figure.PLUM });
-        Debug.Log(prizes.Count);
-        prizes = winChecker.MatchPrize(new List<Figure>() { Figure.PLUM, Figure.LEMON, Figure.LEMON, Figure.LEMON, Figure.LEMON });
-        Debug.Log(prizes.Count);*/
     }
 
     public void Spin() {
@@ -120,7 +120,11 @@ public class SlotMachine : MonoBehaviour {
             return;
         }
 
+        // Set the state to a new spin.
         spinning = true;
+        winningText.text = "";
+        HideAllWinLines();
+
         // Get a random spin duration.
         var rand = new System.Random();
         spinDuration = rand.Next(minSpinTime, maxSpinTime) / 1000f;
@@ -138,16 +142,88 @@ public class SlotMachine : MonoBehaviour {
         nextSpinFinish = spinFinish;
     }
 
+    private void HideAllWinLines() {
+        var boxes = new List<GameObject>();
+        foreach (Transform box in line1Boxes.transform) {
+            box.gameObject.GetComponent<WinBoxControl>().Hide();
+        }
+        foreach (Transform box in line2Boxes.transform) {
+            box.gameObject.GetComponent<WinBoxControl>().Hide();
+        }
+        foreach (Transform box in line3Boxes.transform) {
+            box.gameObject.GetComponent<WinBoxControl>().Hide();
+        }
+    }
+
     private void FixedUpdate() {
         if (spinning && Time.time >= nextSpinFinish) {
             spinning = false;
+            var creditsWon = 0;
 
-            // Get current combination to check prizes with.
+            // Get current combination to check prizes with in the top line.
             var combination = new List<Figure>();
+            foreach (var reelParent in reelControls) {
+                combination.Add(reelParent.GetComponent<ReelControl>().GetFirstFigure());
+            }
+            var winMatches = winChecker.MatchPrize(combination);
+            if (winMatches.Count > 0) {
+                // Only checking the first match on the line.
+                var boxes = new List<GameObject>();
+                foreach (Transform box in line1Boxes.transform) {
+                    boxes.Add(box.gameObject);
+                }
+                boxes[0].GetComponent<WinBoxControl>().DrawStartContinuingBox();
+                var match = winMatches[0];
+                for (var i = match.start + 1; i < match.length - 1; i++) {
+                    boxes[i].GetComponent<WinBoxControl>().DrawContinuation();
+                }
+                boxes[match.length - 1].GetComponent<WinBoxControl>().DrawEnd();
+                creditsWon += match.credits;
+            }
+
+            // Now in the center.
+            combination = new List<Figure>();
             foreach (var reelParent in reelControls) {
                 combination.Add(reelParent.GetComponent<ReelControl>().GetCentralFigure());
             }
-            winChecker.MatchPrize(combination);
+            winMatches = winChecker.MatchPrize(combination);
+            if (winMatches.Count > 0) {
+                // Only checking the first match on the line.
+                var boxes = new List<GameObject>();
+                foreach (Transform box in line2Boxes.transform) {
+                    boxes.Add(box.gameObject);
+                }
+                boxes[0].GetComponent<WinBoxControl>().DrawStartContinuingBox();
+                var match = winMatches[0];
+                for (var i = match.start + 1; i < match.length - 1; i++) {
+                    boxes[i].GetComponent<WinBoxControl>().DrawContinuation();
+                }
+                boxes[match.length - 1].GetComponent<WinBoxControl>().DrawEnd();
+                creditsWon += match.credits;
+            }
+
+            // Finally the bottom line.
+            combination = new List<Figure>();
+            foreach (var reelParent in reelControls) {
+                combination.Add(reelParent.GetComponent<ReelControl>().GetThirdFigure());
+            }
+            winMatches = winChecker.MatchPrize(combination);
+            if (winMatches.Count > 0) {
+                // Only checking the first match on the line.
+                var boxes = new List<GameObject>();
+                foreach (Transform box in line3Boxes.transform) {
+                    boxes.Add(box.gameObject);
+                }
+                boxes[0].GetComponent<WinBoxControl>().DrawStartContinuingBox();
+                var match = winMatches[0];
+                for (var i = match.start + 1; i < match.length - 1; i++) {
+                    boxes[i].GetComponent<WinBoxControl>().DrawContinuation();
+                }
+                boxes[match.length - 1].GetComponent<WinBoxControl>().DrawEnd();
+                creditsWon += match.credits;
+            }
+
+            winningText.text = "Credits won: " + creditsWon;
         }
     }
 }
