@@ -52,6 +52,8 @@ public class WinChecker {
             if (matched == winCombo.figureCount) {
                 found.Add(new PatternMatch(pattern, 0, winCombo.figureCount, winCombo.credits));
                 // Right now looking for one pattern per line only.
+                // We can easily pass this for each line and then combine the winnings,
+                // or perhaps check also inter-reel combinations in this same method.
                 break;
             }
         }
