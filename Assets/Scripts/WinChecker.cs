@@ -7,27 +7,27 @@ public class WinChecker {
 
     public WinChecker() {
         // Load first the configured win combinations.
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.BELL, Figure.BELL, Figure.BELL, Figure.BELL }, 100));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.BELL, Figure.BELL, Figure.BELL }, 75));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.BELL, Figure.BELL }, 70));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.PLUM, Figure.PLUM, Figure.PLUM, Figure.PLUM }, 40));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.PLUM, Figure.PLUM, Figure.PLUM }, 20));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.PLUM, Figure.PLUM }, 10));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.CHERRY, Figure.CHERRY, Figure.CHERRY, Figure.CHERRY }, 10));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.CHERRY, Figure.CHERRY, Figure.CHERRY }, 5));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.CHERRY, Figure.CHERRY, }, 2));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.WATERMELON, Figure.WATERMELON, Figure.WATERMELON, Figure.WATERMELON }, 60));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.WATERMELON, Figure.WATERMELON, Figure.WATERMELON }, 30));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.WATERMELON, Figure.WATERMELON }, 20));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.ORANGE, Figure.ORANGE, Figure.ORANGE, Figure.ORANGE }, 30));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.ORANGE, Figure.ORANGE, Figure.ORANGE }, 15));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.ORANGE, Figure.ORANGE }, 10));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.GRAPES, Figure.GRAPES, Figure.GRAPES, Figure.GRAPES }, 50));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.GRAPES, Figure.GRAPES, Figure.GRAPES }, 20));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.GRAPES, Figure.GRAPES }, 10));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.LEMON, Figure.LEMON, Figure.LEMON, Figure.LEMON }, 20));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.LEMON, Figure.LEMON, Figure.LEMON }, 10));
-        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.LEMON, Figure.LEMON }, 5));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.REIMU, Figure.REIMU, Figure.REIMU, Figure.REIMU }, 100));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.REIMU, Figure.REIMU, Figure.REIMU }, 75));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.REIMU, Figure.REIMU }, 70));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.SAKUYA, Figure.SAKUYA, Figure.SAKUYA, Figure.SAKUYA }, 40));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.SAKUYA, Figure.SAKUYA, Figure.SAKUYA }, 20));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.SAKUYA, Figure.SAKUYA }, 10));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.YOUMU, Figure.YOUMU, Figure.YOUMU, Figure.YOUMU }, 10));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.YOUMU, Figure.YOUMU, Figure.YOUMU }, 5));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.YOUMU, Figure.YOUMU, }, 2));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.CIRNO, Figure.CIRNO, Figure.CIRNO, Figure.CIRNO }, 60));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.CIRNO, Figure.CIRNO, Figure.CIRNO }, 30));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.CIRNO, Figure.CIRNO }, 20));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.REMILIA, Figure.REMILIA, Figure.REMILIA, Figure.REMILIA }, 30));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.REMILIA, Figure.REMILIA, Figure.REMILIA }, 15));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.REMILIA, Figure.REMILIA }, 10));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.MEILING, Figure.MEILING, Figure.MEILING, Figure.MEILING }, 50));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.MEILING, Figure.MEILING, Figure.MEILING }, 20));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.MEILING, Figure.MEILING }, 10));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.FLANDRE, Figure.FLANDRE, Figure.FLANDRE, Figure.FLANDRE }, 20));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.FLANDRE, Figure.FLANDRE, Figure.FLANDRE }, 10));
+        winningPatterns.Add(new WinCombination(new List<Figure>() { Figure.FLANDRE, Figure.FLANDRE }, 5));
         
 
         // After all the winning patterns have been added, we are gonna order it by number of figures.

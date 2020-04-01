@@ -55,13 +55,13 @@ public class SlotMachine : MonoBehaviour {
 
         // Get what sprite needs each figure, so after loading reel configuration we can assign sprites.
         figureToSprite = new Dictionary<Figure, Sprite>() {
-            { Figure.BELL, bell },
-            { Figure.WATERMELON, watermelon },
-            { Figure.GRAPES, grapes },
-            { Figure.PLUM, plum },
-            { Figure.ORANGE, orange },
-            { Figure.LEMON, lemon },
-            { Figure.CHERRY, cherry }
+            { Figure.REIMU, bell },
+            { Figure.CIRNO, watermelon },
+            { Figure.MEILING, grapes },
+            { Figure.SAKUYA, plum },
+            { Figure.REMILIA, orange },
+            { Figure.FLANDRE, lemon },
+            { Figure.YOUMU, cherry }
         };
 
         // Size of the figure in the reel for reference.
